@@ -1,0 +1,406 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Otavio Zerbini</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0a0a0a;
+      --card:#0e0e0e;
+      --text:#ededed;
+      --muted:#a8a8a8;
+      --line:rgba(255,255,255,.08);
+    }
+    html{scroll-behavior:smooth;}
+    html,body{background:var(--bg);color:var(--text);}
+    body{
+      font-family:'Inter',ui-sans-serif,system-ui,sans-serif;
+      font-size:15px;
+      line-height:1.7;
+      -webkit-font-smoothing:antialiased;
+    }
+    .font-display{font-family:'Instrument Serif',ui-serif,Georgia,serif;font-weight:400;}
+    .nav-link{
+      font-family:'Inter',ui-sans-serif,system-ui,sans-serif;
+      font-size:12px;
+      font-weight:600;
+      letter-spacing:.26em;
+      text-transform:uppercase;
+      color:#fff;
+      opacity:.95;
+      display:inline-block;
+      transform-origin:center;
+      transition: transform .35s cubic-bezier(.2,.8,.2,1), opacity .25s ease, letter-spacing .35s cubic-bezier(.2,.8,.2,1);
+    }
+    .nav-link:hover{
+      opacity:1;
+      transform:scale(1.08);
+      letter-spacing:.32em;
+    }
+    .nav-brand{
+      font-family:'Instrument Serif',ui-serif,Georgia,serif;
+      font-size:15px;
+      letter-spacing:.32em;
+      text-transform:uppercase;
+      color:#fff;
+      opacity:.96;
+      display:inline-block;
+      transition: transform .35s cubic-bezier(.2,.8,.2,1), opacity .25s ease;
+    }
+    .nav-brand:hover{
+      opacity:1;
+      transform:scale(1.06);
+    }
+    .body-copy{color:#bdbdbd;font-size:15px;line-height:1.85;}
+    .body-copy p+p{margin-top:1em;}
+    .card{
+      background:var(--card);
+      border-radius:28px;
+      border:1px solid rgba(255,255,255,.05);
+      box-shadow:
+        inset 0 1px 0 0 rgba(255,255,255,.04),
+        0 40px 100px -40px rgba(0,0,0,.95);
+    }
+    .photo{
+      border-radius:8px;
+      box-shadow:
+        0 30px 60px -25px rgba(0,0,0,.95),
+        0 0 0 1px rgba(255,255,255,.06);
+    }
+    .parallax{
+      --rot:0deg;
+      --py:0px;
+      --hx:0px;
+      --hr:0deg;
+      transform: translate3d(var(--hx),var(--py),0) rotate(calc(var(--rot) + var(--hr)));
+      transition: transform .55s cubic-bezier(.2,.8,.2,1);
+      will-change: transform;
+    }
+    @media (prefers-reduced-motion: reduce){
+      .parallax{transform:rotate(var(--rot));}
+    }
+    /* Photo collage: on hover, the two photos drift apart and tilt slightly more.
+       Left photo shifts left + tilts further CCW; right photo shifts right + tilts further CW. */
+    .collage{ cursor: default; }
+    .collage:hover .collage-left{
+      --hx: -14px;
+      --hr: -2deg;
+    }
+    .collage:hover .collage-right{
+      --hx: 14px;
+      --hr: 2deg;
+    }
+    /* Logo variant of collage-right: drifts right but doesn't tilt */
+    .collage:hover .collage-right.no-tilt{
+      --hr: 0deg;
+    }
+    .hero-vignette{
+      position:absolute;inset:0;pointer-events:none;
+      background:
+        linear-gradient(to bottom, rgba(0,0,0,.45) 0%, rgba(0,0,0,0) 22%, rgba(0,0,0,0) 50%, rgba(10,10,10,.55) 78%, var(--bg) 100%);
+    }
+    /* Bottom fade that bleeds the hero into the page background. Sits over
+       everything in the hero (including the cutout) so the transition is seamless. */
+    .hero-fade{
+      position:absolute;left:0;right:0;bottom:0;height:38%;
+      pointer-events:none;
+      background:linear-gradient(to bottom, rgba(10,10,10,0) 0%, rgba(10,10,10,.6) 55%, var(--bg) 100%);
+      z-index:30;
+    }
+    a{transition:opacity .2s ease;}
+    a:hover{opacity:.65;}
+    a:focus-visible{outline:1px solid #fff;outline-offset:3px;border-radius:2px;}
+    .hairline{border-color:var(--line);}
+    .chev{animation:bob 2.4s ease-in-out infinite;}
+    @keyframes bob{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
+    .hero-name{
+      font-family:'Instrument Serif',ui-serif,Georgia,serif;
+      font-weight:400;
+      text-transform:uppercase;
+      letter-spacing:-.005em;
+      line-height:.9;
+      white-space:nowrap;
+      font-size:clamp(56px,13.5vw,196px);
+      color:#ffffff;
+    }
+    /* "Letters change color over the subject" effect.
+       Two H1 layers, identical text + position:
+         1. white H1 (renders everywhere)
+         2. dark H1 inside .hero-mask, which is masked by the cutout PNG
+            so it only appears where pixels of the subject exist.
+       The cutout MUST be sized/positioned identically to the hero background
+       image so the silhouette aligns with the actual figure. */
+    .hero-mask{
+      -webkit-mask-image: url("Brand%20Assets/Transparent%20Header%20Image.png");
+              mask-image: url("Brand%20Assets/Transparent%20Header%20Image.png");
+      -webkit-mask-size: cover;       mask-size: cover;
+      -webkit-mask-position: center 35%; mask-position: center 35%;
+      -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
+              mask-mode: alpha;
+      /* Slight opacity drop to soften the silhouette edge — letters still
+         transition through a small mid-tone step rather than snapping. */
+      opacity: 0.92;
+    }
+    /* Letters within the silhouette are tinted with a gradient that's the
+       INVERSE of the body's brightness:
+         - over the white linen shirt (top half) → dark warm tones
+         - over the dark pants (bottom half)     → light warm tones
+       So letters always contrast with whatever piece of clothing they cross. */
+    .hero-name-tint{
+      background-image: linear-gradient(180deg,
+        #1a1610 0%,    /* head / hair — deep */
+        #0d0a06 22%,   /* upper shirt — near black, max contrast against white linen */
+        #0d0a06 48%,   /* lower shirt — still near black */
+        #c8bda3 62%,   /* waistband — flips to light */
+        #e0d6bd 85%,   /* mid pants — lightest */
+        #d0c6ad 100%); /* feet / deck */
+      -webkit-background-clip: text;
+              background-clip: text;
+      color: transparent;
+    }
+    .display-h{
+      font-family:'Instrument Serif',ui-serif,Georgia,serif;
+      font-weight:400;
+      line-height:.95;
+      font-size:clamp(48px,5.5vw,82px);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============== HERO (full viewport, top nav overlay) ============== -->
+  <section class="relative w-full h-screen min-h-[640px] overflow-hidden">
+
+    <!-- background image -->
+    <img
+      src="Brand%20Assets/Header%20Image.jpg"
+      alt="Otavio Zerbini"
+      class="absolute inset-0 w-full h-full object-cover"
+      style="object-position:center 35%"
+    />
+    <div class="hero-vignette"></div>
+
+    <!-- top nav -->
+    <header class="absolute inset-x-0 top-0 z-20">
+      <nav class="mx-auto max-w-[1400px] px-8 lg:px-14 py-7 grid grid-cols-3 items-center">
+        <div class="flex items-center gap-10 justify-start">
+          <a href="#about" class="nav-link">About</a>
+          <a href="#early-life" class="nav-link">Early Life</a>
+        </div>
+        <div class="flex justify-center">
+          <a href="#" class="nav-brand">Otavio&nbsp;Zerbini</a>
+        </div>
+        <div class="flex items-center gap-10 justify-end">
+          <a href="#creator-os" class="nav-link">Creator&nbsp;OS</a>
+          <a href="#contact" class="nav-link">Contact</a>
+        </div>
+      </nav>
+    </header>
+
+    <!-- name overlay (white, base layer) -->
+    <div class="absolute inset-0 flex items-center justify-center px-4">
+      <h1 class="hero-name text-center">Otavio&nbsp;Zerbini</h1>
+    </div>
+
+    <!-- name overlay (gradient-tinted, masked to silhouette so only the parts of letters over the body are tinted) -->
+    <div class="absolute inset-0 flex items-center justify-center px-4 hero-mask" aria-hidden="true">
+      <h1 class="hero-name hero-name-tint text-center">Otavio&nbsp;Zerbini</h1>
+    </div>
+
+    <!-- bottom fade into page background -->
+    <div class="hero-fade"></div>
+
+    <!-- chevron -->
+    <a href="#about" class="absolute inset-x-0 bottom-8 flex justify-center" aria-label="Scroll down" style="z-index:31">
+      <svg class="chev" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M6 9l6 6 6-6"/>
+      </svg>
+    </a>
+
+  </section>
+
+  <!-- ============== CONTENT ============== -->
+  <main class="mx-auto max-w-[1280px] px-6 sm:px-10 lg:px-14">
+
+    <!-- ============== ABOUT ============== -->
+    <section id="about" class="pt-28 sm:pt-36">
+      <article class="card relative overflow-hidden">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16 items-center min-h-[520px] p-10 sm:p-14 lg:p-16">
+
+          <div>
+            <h2 class="display-h mb-8">About</h2>
+            <div class="body-copy">
+              <p>
+                Otavio Zerbini is a 22-year-old Brazilian-born entrepreneur and former
+                professional footballer. He is the founder of Creator OS — a program-model
+                business helping creators and experts grow on YouTube and monetize through
+                digital products.
+              </p>
+              <p>
+                Built around a high-performance daily routine of training, building, and
+                learning, Otavio is shifting his business from outbound-driven to inbound
+                and brand-led growth — on the way to building a category-defining personal
+                brand for the next generation of online operators.
+              </p>
+            </div>
+          </div>
+
+          <div class="collage relative h-[380px] sm:h-[460px]">
+            <img class="photo parallax collage-left absolute left-[2%] top-[6%] w-[58%] h-[88%] object-cover"
+                 style="--rot:-4deg" data-speed="28"
+                 src="Brand%20Assets/IMG_0466.JPG" alt="Otavio at his desk" />
+            <img class="photo parallax collage-right absolute right-[2%] top-[2%] w-[58%] h-[92%] object-cover"
+                 style="--rot:4deg" data-speed="14"
+                 src="Brand%20Assets/mountains.png" alt="Otavio outdoors" />
+          </div>
+
+        </div>
+      </article>
+    </section>
+
+    <!-- ============== EARLY LIFE ============== -->
+    <section id="early-life" class="pt-16 sm:pt-20">
+      <article class="card relative overflow-hidden">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16 items-center min-h-[520px] p-10 sm:p-14 lg:p-16">
+
+          <div class="collage relative h-[380px] sm:h-[460px] order-last md:order-first">
+            <img class="photo parallax collage-left absolute left-[2%] top-[4%] w-[58%] h-[90%] object-cover"
+                 style="--rot:-4deg" data-speed="28"
+                 src="Brand%20Assets/football.JPG" alt="Otavio playing football" />
+            <img class="photo parallax collage-right absolute right-[2%] top-[2%] w-[58%] h-[92%] object-cover"
+                 style="--rot:4deg" data-speed="14"
+                 src="Brand%20Assets/baby%20Pic.JPG" alt="Otavio as a child" />
+          </div>
+
+          <div>
+            <h2 class="display-h mb-8">Early life</h2>
+            <div class="body-copy">
+              <p>
+                Born and raised in Brazil, Otavio grew up inside the academy system of
+                professional football — long mornings, double sessions, and a quiet
+                obsession with becoming the best version of himself. By his late teens
+                he was competing at a senior level.
+              </p>
+              <p>
+                A turning point pushed him to channel that same intensity into business.
+                The discipline carried over: training every morning, building every
+                afternoon, learning every night. What began as content on YouTube and
+                Instagram evolved into a long-term plan to do for online education what
+                he never got to finish on the pitch.
+              </p>
+            </div>
+          </div>
+
+        </div>
+      </article>
+    </section>
+
+    <!-- ============== CREATOR OS ============== -->
+    <section id="creator-os" class="pt-16 sm:pt-20">
+      <article class="card relative overflow-hidden">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10 lg:gap-16 items-center min-h-[520px] p-10 sm:p-14 lg:p-16">
+
+          <div>
+            <p class="nav-link mb-5" style="color:#a8a8a8">Company</p>
+            <h2 class="display-h mb-8">Creator&nbsp;OS</h2>
+            <div class="body-copy">
+              <p>
+                Founded in 2024, Creator OS is the program-model business that helps
+                creators and experts grow on YouTube and monetize through digital
+                products. The flagship offer is a high-touch program built around a
+                single promise — turn an audience into an asset.
+              </p>
+              <p>
+                It is the operating system Otavio wishes existed when he started:
+                frameworks, coaching, and a community of operators executing at the top.
+                Creator OS exists to compress the years it takes to build a
+                category-defining personal brand into a focused, repeatable system.
+              </p>
+            </div>
+          </div>
+
+          <div class="collage relative h-[380px] sm:h-[460px]">
+            <img class="photo parallax collage-left absolute left-[0%] top-[5%] w-[54%] h-[90%] object-cover"
+                 style="--rot:-5deg" data-speed="26"
+                 src="Brand%20Assets/workshop.jpg" alt="Creator OS team session" />
+            <div class="absolute right-[2%] top-1/2 -translate-y-1/2 w-[44%] flex justify-center">
+              <img class="parallax collage-right no-tilt w-auto max-h-[260px] sm:max-h-[320px] object-contain"
+                   style="--rot:0deg" data-speed="14"
+                   src="Brand%20Assets/Creator%20OS%20Logo.png" alt="Creator OS" />
+            </div>
+          </div>
+
+        </div>
+      </article>
+    </section>
+
+    <!-- ============== GET IN TOUCH ============== -->
+    <section id="contact" class="pt-32 sm:pt-40 pb-28">
+      <h2 class="display-h text-center mb-12">Get in Touch</h2>
+      <div class="flex items-center justify-center gap-9 text-white/85">
+        <a href="https://www.youtube.com/@OtavioZerbini/videos" target="_blank" rel="noopener" aria-label="YouTube">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8ZM9.6 15.6V8.4l6.3 3.6-6.3 3.6Z"/></svg>
+        </a>
+        <a href="https://www.instagram.com/otaviozerbini/" target="_blank" rel="noopener" aria-label="Instagram">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
+        </a>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============== FOOTER ============== -->
+  <footer class="border-t hairline">
+    <div class="mx-auto max-w-[1280px] px-6 sm:px-10 lg:px-14 py-9 flex items-center justify-between">
+      <p class="font-display text-2xl">LOZ Global Ventures PR LLC&nbsp;&nbsp;·&nbsp;&nbsp;2026</p>
+      <nav class="flex items-center gap-7 nav-link">
+        <a href="https://www.youtube.com/@OtavioZerbini/videos" target="_blank" rel="noopener">YouTube</a>
+        <a href="https://www.instagram.com/otaviozerbini/" target="_blank" rel="noopener">Instagram</a>
+      </nav>
+    </div>
+  </footer>
+
+  <script>
+    // Subtle scroll parallax for tilted photos.
+    // Each .parallax element gets a translateY based on its distance from
+    // viewport center. data-speed controls the magnitude (px).
+    (function () {
+      const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduce) return;
+
+      const els = Array.from(document.querySelectorAll('.parallax'));
+      let ticking = false;
+
+      function update() {
+        const vh = window.innerHeight;
+        for (const el of els) {
+          const r = el.getBoundingClientRect();
+          const center = r.top + r.height / 2;
+          // -1 (above viewport) → 0 (centered) → 1 (below)
+          const t = Math.max(-1.2, Math.min(1.2, (center - vh / 2) / vh));
+          const speed = parseFloat(el.dataset.speed || '20');
+          el.style.setProperty('--py', (t * -speed).toFixed(2) + 'px');
+        }
+        ticking = false;
+      }
+
+      function onScroll() {
+        if (!ticking) {
+          window.requestAnimationFrame(update);
+          ticking = true;
+        }
+      }
+
+      window.addEventListener('scroll', onScroll, { passive: true });
+      window.addEventListener('resize', onScroll);
+      update();
+    })();
+  </script>
+
+</body>
+</html>
